@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { Pokemon } from '../pokemon';
 import { PokemonService } from '../pokemon.service';
 
@@ -7,15 +8,16 @@ import { PokemonService } from '../pokemon.service';
   selector: 'app-detail-pokemon',
   templateUrl: './detail-pokemon.component.html'
 })
-export class DetailPokemonComponent implements OnInit {
+export class DetailPokemonComponent implements OnInit, OnDestroy {
   pokemon: Pokemon | undefined;
+  newSubscription!: Subscription;
 
   constructor(private route: ActivatedRoute, private router: Router, private pokemonService: PokemonService) { }
 
   ngOnInit(): void {
     const pokemonId: string | null = this.route.snapshot.paramMap.get('id');
     if (pokemonId) {
-      this.pokemon = this.pokemonService.getPokemonById(+pokemonId);
+      this.newSubscription = this.pokemonService.getPokemonById(+pokemonId).subscribe((pokemon) => { this.pokemon = pokemon });
     }
   }
 
@@ -25,5 +27,9 @@ export class DetailPokemonComponent implements OnInit {
 
   goToEditPokemon(pokemon: Pokemon) {
     this.router.navigate(['/edit/pokemon', pokemon.id]);
+  }
+
+  ngOnDestroy(): void {
+    this.newSubscription.unsubscribe();
   }
 }

@@ -1,5 +1,6 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { Pokemon } from '../pokemon';
 import { PokemonService } from '../pokemon.service';
 
@@ -8,7 +9,8 @@ import { PokemonService } from '../pokemon.service';
   templateUrl: './pokemon-form.component.html',
   styleUrls: ['./pokemon-form.component.scss'],
 })
-export class PokemonFormComponent implements OnInit {
+export class PokemonFormComponent implements OnInit, OnDestroy {
+  newSubscription!: Subscription;
   @Input() pokemon!: Pokemon;
   types: string[] = [];
 
@@ -43,6 +45,15 @@ export class PokemonFormComponent implements OnInit {
   }
 
   onSubmit() {
-    this.router.navigate(['/pokemons', this.pokemon.id])
+    this.newSubscription = this.pokemonService.updatePokemon(this.pokemon).subscribe((pokemon) => {
+      if (pokemon) {
+        this.router.navigate(['/pokemons', pokemon.id])
+      }
+    })
+
+  }
+
+  ngOnDestroy(): void {
+    this.newSubscription.unsubscribe();
   }
 }
