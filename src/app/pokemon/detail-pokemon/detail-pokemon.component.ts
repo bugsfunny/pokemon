@@ -15,12 +15,12 @@ export class DetailPokemonComponent implements OnInit {
 
   ngOnInit(): void {
     this.pokemonList = POKEMONS;
-    const pokemonId: string|null = this.route.snapshot.paramMap.get('id');
-    if(pokemonId){
+    const pokemonId: string | null = this.route.snapshot.paramMap.get('id');
+    if (pokemonId) {
       this.pokemon = this.pokemonList.find(it => +pokemonId === it.id);
     }
   }
-  
+
   goBack() {
     this.router.navigate(['/pokemons']);
   }
